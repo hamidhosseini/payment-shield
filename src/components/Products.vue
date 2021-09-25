@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-row class="row-container mb-4" v-for="(product, index) in products" :key="product.id">
+    <v-row class="row-container mb-4" v-for="product in computedProducts" :key="product.id">
       <v-col cols="12" md="3" class="d-flex justify-center justify-md-start">
         <v-img
           :src="require('../assets/' + product.img)"
@@ -13,15 +13,17 @@
 
       <v-col cols="12" md="3" class="text-center d-flex justify-center flex-column" v-if="!product.quoteDeclined">
         <span class="text-h3">
-          £{{ product.price.toFixed(2) }}
+          £{{ product.newPrice.toFixed(2) }}
         </span>
         <span class="d-block text-h6 shieldOrange" v-if="product.isLowestPrice">
           Lowest Price
         </span>
         <div>
           <v-select
+            v-model="product.selectedSubscription"
             :items="product.subscriptionOptions"
-            label="Monthly"
+            item-text="duration"
+            item-value="id"
             outlined
             dense
             hide-details
@@ -34,26 +36,26 @@
       <v-col cols="12" md="3" class="d-flex justify-space-around flex-column px-4" v-if="!product.quoteDeclined">
         <span class="d-block">Buildings accidental damage</span>
         <div class="d-flex justify-space-between align-center">
-          <span class="text-h5 mr-2">+ £{{ product.buildingsAccidentalDamage }}</span>
+          <span class="text-h5 mr-2" v-if="!product.isBadApplied">+ £{{ product.buildingsAccidentalDamage }}</span>
+          <span class="text-h5 mr-2" v-else>Included</span>
           <v-switch
             v-model="product.isBadApplied"
             color="juicyRed"
             hide-details
             style="margin-top: 0px !important"
             inset
-            @click="recalculateProductPrice(product, index, 'BAD')"
           ></v-switch>
         </div>
         <span class="d-block mt-2">Contents accidental damage</span>
         <div class="d-flex justify-space-between align-center">
-          <span class="mr-2 text-h5">+ £{{ product.contentsAccidentalDamage }}</span>
+          <span class="mr-2 text-h5" v-if="!product.isCadApplied">+ £{{ product.contentsAccidentalDamage }}</span>
+          <span class="text-h5 mr-2" v-else>Included</span>
           <v-switch
             v-model="product.isCadApplied"
             color="juicyRed"
             hide-details
             style="margin-top: 0px !important"
             inset
-            @click="recalculateProductPrice(product, index, 'CAD')"
           ></v-switch>
         </div>
       </v-col>
@@ -93,12 +95,18 @@ export default {
       {
         id: 1,
         name: 'LVE',
-        price: 36.89,
+        originalPrice: 36.89,
+        newPrice: 36.89,
         buildingsAccidentalDamage: 26.92,
         isBadApplied: false,
         contentsAccidentalDamage: 12.67,
         isCadApplied: false,
-        subscriptionOptions: ['Monthly', 'Yearly', '3 Months Deferred'],
+        selectedSubscription: { duration: 'Monthly', id: 'monthly' },
+        subscriptionOptions: [
+          { duration: 'Monthly', id: 'monthly' },
+          { duration: 'Yearly', id: 'yearly' },
+          { duration: '3 Months Deferred', id: '3monthdef' }
+        ],
         isLowestPrice: true,
         img: 'lv.png',
         quoteDeclined: false,
@@ -107,12 +115,18 @@ export default {
       {
         id: 2,
         name: 'ukgeneral',
-        price: 37.89,
+        originalPrice: 37.89,
+        newPrice: 37.89,
         buildingsAccidentalDamage: 26.92,
         isBadApplied: false,
         contentsAccidentalDamage: 12.67,
         isCadApplied: false,
-        subscriptionOptions: ['Monthly', 'Yearly', '3 Months Deferred'],
+        selectedSubscription: { duration: 'Yearly', id: 'yearly' },
+        subscriptionOptions: [
+          { duration: 'Monthly', id: 'monthly' },
+          { duration: 'Yearly', id: 'yearly' },
+          { duration: '3 Months Deferred', id: '3monthdef' }
+        ],
         isLowestPrice: false,
         img: 'ukgeneral.png',
         quoteDeclined: false,
@@ -121,12 +135,18 @@ export default {
       {
         id: 3,
         name: 'prestige',
-        price: 49.61,
+        originalPrice: 49.61,
+        newPrice: 49.61,
         buildingsAccidentalDamage: 26.92,
         isBadApplied: false,
         contentsAccidentalDamage: 12.67,
         isCadApplied: false,
-        subscriptionOptions: ['Monthly', 'Yearly', '3 Months Deferred'],
+        selectedSubscription: { duration: 'Yearly', id: 'yearly' },
+        subscriptionOptions: [
+          { duration: 'Monthly', id: 'monthly' },
+          { duration: 'Yearly', id: 'yearly' },
+          { duration: '3 Months Deferred', id: '3monthdef' }
+        ],
         isLowestPrice: false,
         img: 'prestige.png',
         quoteDeclined: false,
@@ -135,12 +155,18 @@ export default {
       {
         id: 4,
         name: 'axa',
-        price: 0,
+        originalPrice: 0,
+        newPrice: 0,
         buildingsAccidentalDamage: 0,
         isBadApplied: false,
         contentsAccidentalDamage: 0,
         isCadApplied: false,
-        subscriptionOptions: ['Monthly', 'Yearly', '3 Months Deferred'],
+        selectedSubscription: { duration: 'Yearly', id: 'yearly' },
+        subscriptionOptions: [
+          { duration: 'Monthly', id: 'monthly' },
+          { duration: 'Yearly', id: 'yearly' },
+          { duration: '3 Months Deferred', id: '3monthdef' }
+        ],
         isLowestPrice: false,
         img: 'axa.png',
         quoteDeclined: true,
@@ -149,19 +175,27 @@ export default {
 
     ]
   }),
-  methods: {
-    recalculateProductPrice (product, index, type) {
-      if (product.isBadApplied && type === 'BAD') {
-        this.products[index].price  += product.buildingsAccidentalDamage
-      } else if (!product.isBadApplied&& type === 'BAD') {
-        this.products[index].price  -= product.buildingsAccidentalDamage
-      }
-      
-      if (product.isCadApplied && type === 'CAD') {
-        this.products[index].price  += product.contentsAccidentalDamage
-      } else if (!product.isCadApplied && type === 'CAD') {
-        this.products[index].price  -= product.contentsAccidentalDamage
-      }
+  computed: {
+    computedProducts () {
+      this.products.forEach((product, index) => {
+        this.products[index].newPrice = this.products[index].originalPrice
+        if (product.isBadApplied) {
+          this.products[index].newPrice += product.buildingsAccidentalDamage
+        }
+
+        if (product.isCadApplied) {
+          this.products[index].newPrice += product.contentsAccidentalDamage
+        }
+
+        if (product.selectedSubscription == 'yearly') {
+          this.products[index].newPrice = product.newPrice * 12
+        }
+
+        if (product.selectedSubscription == '3monthdef') {
+          this.products[index].newPrice = product.newPrice * 3
+        }
+      })
+      return this.products
     }
   }
 };

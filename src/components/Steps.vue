@@ -22,7 +22,7 @@
 
 <script>
   export default {
-    name: 'HelloWorld',
+    name: 'Steps',
 
     data: () => ({
       steps: [
