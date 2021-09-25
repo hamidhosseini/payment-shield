@@ -121,7 +121,7 @@ export default {
         isBadApplied: false,
         contentsAccidentalDamage: 12.67,
         isCadApplied: false,
-        selectedSubscription: { duration: 'Yearly', id: 'yearly' },
+        selectedSubscription: { duration: 'Monthly', id: 'monthly' },
         subscriptionOptions: [
           { duration: 'Monthly', id: 'monthly' },
           { duration: 'Yearly', id: 'yearly' },
@@ -141,7 +141,7 @@ export default {
         isBadApplied: false,
         contentsAccidentalDamage: 12.67,
         isCadApplied: false,
-        selectedSubscription: { duration: 'Yearly', id: 'yearly' },
+        selectedSubscription: { duration: 'Monthly', id: 'monthly' },
         subscriptionOptions: [
           { duration: 'Monthly', id: 'monthly' },
           { duration: 'Yearly', id: 'yearly' },
@@ -161,7 +161,7 @@ export default {
         isBadApplied: false,
         contentsAccidentalDamage: 0,
         isCadApplied: false,
-        selectedSubscription: { duration: 'Yearly', id: 'yearly' },
+        selectedSubscription: { duration: 'Monthly', id: 'monthly' },
         subscriptionOptions: [
           { duration: 'Monthly', id: 'monthly' },
           { duration: 'Yearly', id: 'yearly' },
