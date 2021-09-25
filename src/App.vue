@@ -1,28 +1,57 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <v-app color="grey">
+    <AppBar/>
+    <v-main>
+      <RatingCard/>
+      <Totals/>
+      <Products/>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Totals from './components/Totals'
+import Products from './components/Products'
+import AppBar from './components/layout/AppBar'
+import RatingCard from './components/RatingCard'
 
 export default {
   name: 'App',
+
   components: {
-    HelloWorld
+    Totals,
+    Products,
+    AppBar,
+    RatingCard
   }
-}
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  @font-face {
+    font-family: "lato-black";
+    src: local("lato-black"),
+    url(./fonts/Lato/Lato-Black.ttf) format("truetype");
+  }
+
+  @font-face {
+    font-family: "lato-regular";
+    src: local("lato-regular"),
+    url(./fonts/Lato/Lato-Regular.ttf) format("truetype");
+  }
+
+  .container {
+    max-width: 1100px;
+    font-family: 'lato-regular';
+  }
+
+  .btn-white {
+    color: white;
+  }
+
+  .row-container {
+    border: 1px solid rgba(128, 128, 128, 0.404);
+    margin: 5px;
+    border-radius: 3px;
+  }
 </style>
